@@ -14,6 +14,19 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   web:
     build: .
     restart: unless-stopped
@@ -24,11 +37,40 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - static_data:/app/staticfiles
       - media_data:/app/media
 
+  celery_worker:
+    build: .
+    restart: unless-stopped
+    command: celery -A disaster worker --loglevel=info --concurrency=2
+    env_file:
+      - .env.docker
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - media_data:/app/media
+
+  celery_beat:
+    build: .
+    restart: unless-stopped
+    command: celery -A disaster beat --loglevel=info
+    env_file:
+      - .env.docker
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data:
+  redis_data:
   static_data:
   media_data:
