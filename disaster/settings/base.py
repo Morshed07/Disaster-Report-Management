@@ -54,8 +54,9 @@ INSTALLED_APPS = [
 
 
     # <----------Local Apps------------>
-    
-    
+    'apps.core',
+    'apps.reports',
+
 ]
 
 MIDDLEWARE = [
