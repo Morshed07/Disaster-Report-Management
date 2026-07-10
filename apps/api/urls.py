@@ -1,6 +1,7 @@
-from disaster.urls import urlpatterns
-from django.urls import path
+from django.urls import path, include
 
-urlpatterns=[
-    
+urlpatterns = [
+
+    path('', include('apps.reports.urls'))
+
 ]
