@@ -1,0 +1,218 @@
+{
+  "info": {
+    "_postman_id": "8bfa2e9a-7c93-41fa-8a71-a08b67144e05",
+    "name": "Disaster Management API",
+    "description": "Endpoints to submit earthquake damage reports, check status, and submit contact messages.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Submit Damage Report",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "name",
+              "value": "John Doe",
+              "type": "text"
+            },
+            {
+              "key": "email",
+              "value": "john.doe@example.com",
+              "type": "text"
+            },
+            {
+              "key": "phone_number",
+              "value": "06 12 345 678",
+              "type": "text"
+            },
+            {
+              "key": "address",
+              "value": "Kerklaan 12",
+              "type": "text"
+            },
+            {
+              "key": "city",
+              "value": "Groningen",
+              "type": "text"
+            },
+            {
+              "key": "postcode",
+              "value": "9700 AG",
+              "type": "text"
+            },
+            {
+              "key": "building_type",
+              "value": "residential",
+              "description": "Choices: residential, vve, commercial, investment",
+              "type": "text"
+            },
+            {
+              "key": "applicable_case",
+              "value": "new_report",
+              "description": "Choices: new_report, recording_before_renovation, second_opinion, objection_review, other",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "My wall has developed a crack after the earthquake. Needs immediate review.",
+              "description": "Minimum 20 characters required",
+              "type": "text"
+            },
+            {
+              "key": "contact_preference",
+              "value": "email",
+              "description": "Choices: email, phone, both",
+              "type": "text"
+            },
+            {
+              "key": "privacy_policy_accepted",
+              "value": "true",
+              "description": "Must be true",
+              "type": "text"
+            },
+            {
+              "key": "attachments",
+              "type": "file",
+              "description": "Upload image, pdf, docx etc. (Optional)",
+              "value": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/reports/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "reports",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Check Case Status (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"case_number\": \"BN-2026-955463\",\n  \"email\": \"john.doe@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/reports/check-status/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "reports",
+            "check-status",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Check Case Status (GET query params)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/reports/check-status/?case_number=BN-2026-955463&email=john.doe@example.com",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "reports",
+            "check-status",
+            ""
+          ],
+          "query": [
+            {
+              "key": "case_number",
+              "value": "BN-2026-955463"
+            },
+            {
+              "key": "email",
+              "value": "john.doe@example.com"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Contact Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Jane Smith\",\n  \"phone_number\": \"1234567890\",\n  \"email\": \"jane.smith@example.com\",\n  \"message\": \"Hello, I would like to inquire about eligibility rules for commercial damage assessment.\",\n  \"privacy_policy_accepted\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/messages/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "messages",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8005",
+      "type": "string"
+    }
+  ]
+}

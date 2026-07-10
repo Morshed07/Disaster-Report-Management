@@ -12,6 +12,21 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 import environ
+from corsheaders.defaults import default_headers
+
+# Force redis-py to use RESP2 protocol to avoid HELLO command failures with older Redis versions
+os.environ["REDIS_SERIALIZATION_PROTOCOL"] = "2"
+
+try:
+    import redis
+    original_redis_init = redis.Connection.__init__
+    def patched_redis_init(self, *args, **kwargs):
+        kwargs["protocol"] = 2
+        kwargs["maint_notifications_config"] = None
+        original_redis_init(self, *args, **kwargs)
+    redis.Connection.__init__ = patched_redis_init
+except ImportError:
+    pass
 
 
 env = environ.Env(
@@ -39,6 +54,19 @@ ALLOWED_HOSTS = ['*']
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "ngrok-skip-browser-warning",
+]
+
+# CSRF Trusted Origins for proxy tunneling (e.g. Ngrok)
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.ngrok-free.app",
+    "https://*.ngrok-free.dev",
+    "https://*.ngrok.io",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -60,6 +88,7 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.reports',
     'apps.api',
+    'apps.messages',
 
 ]
 
@@ -171,13 +200,12 @@ CELERY_RESULT_BACKEND = "django-db"
 # -------------------------
 # Email Configuration
 # -------------------------
-EMAIL_BACKEND = os.environ.get(
-    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
-)
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
-EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() in ("true", "1", "yes")
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="")
+
 

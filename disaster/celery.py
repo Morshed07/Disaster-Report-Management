@@ -5,7 +5,6 @@ This module defines the Celery application instance used by all
 async tasks across the project (e.g., sending emails).
 """
 import os
-
 from celery import Celery
 
 # Default to development settings (overridden by env var in Docker)
