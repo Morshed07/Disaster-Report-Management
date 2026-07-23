@@ -89,6 +89,8 @@ INSTALLED_APPS = [
     'apps.reports',
     'apps.api',
     'apps.messages',
+    'apps.subsidies',
+
 
 ]
 

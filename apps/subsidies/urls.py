@@ -1,8 +1,11 @@
 from django.urls import path
 
-from .views import SubsidyScanRequestAPIView
+from .views import (
+    SubsidyScanRequestAPIView,
+)
 
 urlpatterns = [
+    # Subsidy scan form
     path(
         "subsidy-scan/",
         SubsidyScanRequestAPIView.as_view(),
