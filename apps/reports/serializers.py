@@ -31,6 +31,7 @@ class DamageReportSerializer(serializers.ModelSerializer):
         model = DamageReport
         fields = [
             "case_number",
+            "activecampaign_deal_id",
             "name",
             "email",
             "phone_number",

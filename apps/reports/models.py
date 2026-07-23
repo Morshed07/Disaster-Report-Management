@@ -82,6 +82,15 @@ class DamageReport(TimeStampedModel):
         editable=False,
     )
 
+    # ActiveCampaign CRM integration — stores the AC Deal ID so inbound
+    # webhooks can reliably look up the matching DamageReport.
+    activecampaign_deal_id = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        help_text="ActiveCampaign Deal ID for CRM sync.",
+    )
+
     # --- Contact & address fields ---
     name = models.CharField(max_length=150)
     email = models.EmailField()

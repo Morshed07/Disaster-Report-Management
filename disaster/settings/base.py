@@ -212,3 +212,17 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="")
 
 
+# -------------------------
+# ActiveCampaign CRM Integration
+# -------------------------
+# All values are env-driven.  Leave blank until the client provides
+# real credentials — the AC client will silently no-op.
+ACTIVECAMPAIGN_API_URL = env("ACTIVECAMPAIGN_API_URL", default="")
+ACTIVECAMPAIGN_API_KEY = env("ACTIVECAMPAIGN_API_KEY", default="")
+ACTIVECAMPAIGN_SCHADECHECK_PIPELINE_ID = env("ACTIVECAMPAIGN_SCHADECHECK_PIPELINE_ID", default="")
+ACTIVECAMPAIGN_SUBSIDIESCAN_PIPELINE_ID = env("ACTIVECAMPAIGN_SUBSIDIESCAN_PIPELINE_ID", default="")
+ACTIVECAMPAIGN_NEW_LEADS_STAGE_ID = env("ACTIVECAMPAIGN_NEW_LEADS_STAGE_ID", default="")
+ACTIVECAMPAIGN_CASE_NUMBER_FIELD_ID = env("ACTIVECAMPAIGN_CASE_NUMBER_FIELD_ID", default="")
+ACTIVECAMPAIGN_WEBHOOK_SECRET = env("ACTIVECAMPAIGN_WEBHOOK_SECRET", default="")
+
+
