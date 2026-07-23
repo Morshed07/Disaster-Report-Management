@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     'apps.api',
     'apps.messages',
     'apps.subsidies',
+    'apps.helpRequest',
 
 
 ]
