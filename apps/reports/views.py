@@ -140,6 +140,7 @@ class DamageReportViewSet(viewsets.ModelViewSet):
 # AC pipeline stages 6–10 (Phase 2) mapped to our website CaseStatus.
 # Phase 1 stages (1–5) are internal CRM stages and should be ignored.
 AC_STAGE_TO_CASE_STATUS = {
+    # English mappings
     "client / contract signed": CaseStatus.RECEIVED,
     "contract signed": CaseStatus.RECEIVED,
     "earthquake damage reported": CaseStatus.UNDER_REVIEW,
@@ -150,10 +151,19 @@ AC_STAGE_TO_CASE_STATUS = {
     "invoice processed / payout": CaseStatus.COMPLETED,
     "invoice processed": CaseStatus.COMPLETED,
     "payout": CaseStatus.COMPLETED,
+
+    # Dutch mappings (from active ActiveCampaign setup)
+    "adres aangemeld img": CaseStatus.RECEIVED,
+    "schade-opname ingepland": CaseStatus.IN_PROGRESS,
+    "adviesrapport ontvangen": CaseStatus.IN_PROGRESS,
+    "beschikking ontvangen": CaseStatus.IN_PROGRESS,
+    "beschikking ontvangen ": CaseStatus.IN_PROGRESS,
+    "schadebedrag uitbetaald en factuur gestuurd": CaseStatus.COMPLETED,
 }
 
 # Phase 1 stage names — these are explicitly ignored (no-op).
 AC_PHASE1_STAGES = {
+    # English
     "new lead",
     "new leads",
     "first contact",
@@ -162,6 +172,13 @@ AC_PHASE1_STAGES = {
     "inspection appointment scheduled",
     "inspection scheduled",
     "disqualified",
+
+    # Dutch (from active ActiveCampaign setup)
+    "nieuwe lead schadecheck",
+    "contact opgenomen 1x",
+    "contact opgenomen 2x",
+    "schadecheck ingepland",
+    "formulieren opgestuurd",
 }
 
 

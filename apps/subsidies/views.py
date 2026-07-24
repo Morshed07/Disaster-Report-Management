@@ -59,11 +59,12 @@ class SubsidyScanRequestAPIView(APIView):
             )
 
             if contact_id:
+                stage_id = getattr(settings, "ACTIVECAMPAIGN_SUBSIDIESCAN_NEW_LEADS_STAGE_ID", "") or settings.ACTIVECAMPAIGN_NEW_LEADS_STAGE_ID
                 client.create_deal(
                     title=f"Subsidiescan — {scan.full_name}",
                     contact_id=contact_id,
                     pipeline_id=settings.ACTIVECAMPAIGN_SUBSIDIESCAN_PIPELINE_ID,
-                    stage_id=settings.ACTIVECAMPAIGN_NEW_LEADS_STAGE_ID,
+                    stage_id=stage_id,
                 )
 
         except ActiveCampaignError:

@@ -133,6 +133,7 @@ class DamageReportAPITests(APITestCase):
 # ActiveCampaign Webhook Tests
 # ---------------------------------------------------------------------------
 
+@override_settings(ACTIVECAMPAIGN_WEBHOOK_SECRET="")
 class ActiveCampaignWebhookTests(APITestCase):
     """Tests for the inbound ActiveCampaign webhook endpoint."""
 
