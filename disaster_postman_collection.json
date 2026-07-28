@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "8bfa2e9a-7c93-41fa-8a71-a08b67144e05",
     "name": "Disaster Management API",
-    "description": "Endpoints to submit earthquake damage reports, check status, and submit contact messages.",
+    "description": "Endpoints to submit earthquake damage reports, check status, submit contact messages, request subsidy scans, and create/retrieve help requests.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -16,56 +16,86 @@
           "formdata": [
             {
               "key": "name",
-              "value": "John Doe",
+              "value": "Jan Jansen",
+              "description": "First and last name",
               "type": "text"
             },
             {
               "key": "email",
-              "value": "john.doe@example.com",
+              "value": "jan.jansen@example.nl",
+              "description": "Email address",
               "type": "text"
             },
             {
               "key": "phone_number",
-              "value": "06 12 345 678",
+              "value": "06 12 34 56 78",
+              "description": "Phone number",
               "type": "text"
             },
             {
               "key": "address",
-              "value": "Kerklaan 12",
+              "value": "Extended Hereweg 12",
+              "description": "Address (Street and house number)",
               "type": "text"
             },
             {
               "key": "city",
               "value": "Groningen",
+              "description": "City (Optional)",
               "type": "text"
             },
             {
               "key": "postcode",
-              "value": "9700 AG",
+              "value": "9722 AF",
+              "description": "Postcode (Optional)",
               "type": "text"
             },
             {
               "key": "building_type",
-              "value": "residential",
-              "description": "Choices: residential, vve, commercial, investment",
+              "value": "home",
+              "description": "Choices: home (Private home), vve (Homeowners Association), rental (Rental property), commercial (Commercial building)",
+              "type": "text"
+            },
+            {
+              "key": "damage_reported_before",
+              "value": "false",
+              "description": "Has damage been reported before? (true/false)",
+              "type": "text"
+            },
+            {
+              "key": "is_own_property",
+              "value": "true",
+              "description": "Is the property your property? (true/false)",
+              "type": "text"
+            },
+            {
+              "key": "damage_scope",
+              "value": "[\"damage_inside\", \"subsidence\"]",
+              "description": "JSON array of selected aspects: damage_inside, damage_outside, subsidence",
+              "type": "text"
+            },
+            {
+              "key": "comments",
+              "value": "Cracks appeared on living room wall after the tremor.",
+              "description": "Additional comments (Optional)",
               "type": "text"
             },
             {
               "key": "applicable_case",
               "value": "new_report",
-              "description": "Choices: new_report, recording_before_renovation, second_opinion, objection_review, other",
+              "description": "Choices: new_report, recording_before_renovation, second_opinion, objection_review, other (Optional)",
               "type": "text"
             },
             {
               "key": "description",
-              "value": "My wall has developed a crack after the earthquake. Needs immediate review.",
-              "description": "Minimum 20 characters required",
+              "value": "Cracks appeared on living room wall after the tremor.",
+              "description": "Detailed description (Optional)",
               "type": "text"
             },
             {
               "key": "contact_preference",
               "value": "email",
-              "description": "Choices: email, phone, both",
+              "description": "Choices: email, phone, both (Optional)",
               "type": "text"
             },
             {
@@ -182,6 +212,160 @@
             "v1",
             "messages",
             ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Subsidy Scan Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"full_name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone_number\": \"06 12 34 56 78\",\n  \"property_address\": \"Kerklaan 12\",\n  \"postal_code\": \"9700 AG\",\n  \"place_of_residence\": \"Groningen\",\n  \"property_type\": \"home\",\n  \"construction_year_period\": \"1946_1970\",\n  \"is_own_property\": true,\n  \"reported_damage_before\": false,\n  \"received_decision\": false,\n  \"comments\": \"Interested in sustainability subsidies for foundation repairs.\",\n  \"privacy_policy_accepted\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/subsidies/subsidy-scan/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "subsidies",
+            "subsidy-scan",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Help Request",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "full_name",
+              "value": "Jane Smith",
+              "type": "text"
+            },
+            {
+              "key": "email",
+              "value": "jane.smith@example.com",
+              "type": "text"
+            },
+            {
+              "key": "phone_number",
+              "value": "06 98 76 54 32",
+              "type": "text"
+            },
+            {
+              "key": "address",
+              "value": "Main Street 45, Groningen",
+              "type": "text"
+            },
+            {
+              "key": "help_type",
+              "value": "claims_handling",
+              "description": "Choices: claims_handling, pre_shot, second_opinion, objection_procedures, repair_own_contractor, otherwise, legal_advice, damage_claim_help, structural_inspection, subsidy_assistance, general_inquiry, other",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "I need assistance filing an objection regarding the initial damage assessment decision.",
+              "description": "Minimum 20 characters required",
+              "type": "text"
+            },
+            {
+              "key": "contact_preference",
+              "value": "email",
+              "description": "Choices: email, phone, both",
+              "type": "text"
+            },
+            {
+              "key": "privacy_policy_accepted",
+              "value": "true",
+              "description": "Must be true",
+              "type": "text"
+            },
+            {
+              "key": "attachments",
+              "type": "file",
+              "description": "Upload files/documents (Optional)",
+              "value": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/help-requests/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "help-requests",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Help Requests",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/help-requests/list/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "help-requests",
+            "list",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Help Request Detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/v1/help-requests/:request_number/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "help-requests",
+            ":request_number",
+            ""
+          ],
+          "variable": [
+            {
+              "key": "request_number",
+              "value": "HR-2026-123456",
+              "description": "The unique help request number"
+            }
           ]
         }
       },

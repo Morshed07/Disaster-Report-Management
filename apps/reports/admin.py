@@ -16,8 +16,22 @@ class CaseUpdateInline(admin.TabularInline):
 
 @admin.register(DamageReport)
 class DamageReportAdmin(admin.ModelAdmin):
-    list_display = ("case_number", "name", "email", "submitted_at")
-    list_filter = ("building_type", "applicable_case", "submitted_at")
+    list_display = (
+        "case_number",
+        "name",
+        "email",
+        "building_type",
+        "damage_reported_before",
+        "is_own_property",
+        "submitted_at",
+    )
+    list_filter = (
+        "building_type",
+        "damage_reported_before",
+        "is_own_property",
+        "applicable_case",
+        "submitted_at",
+    )
     search_fields = (
         "case_number",
         "name",

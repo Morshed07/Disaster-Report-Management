@@ -39,6 +39,10 @@ class DamageReportSerializer(serializers.ModelSerializer):
             "city",
             "postcode",
             "building_type",
+            "damage_reported_before",
+            "is_own_property",
+            "damage_scope",
+            "comments",
             "applicable_case",
             "description",
             "contact_preference",
@@ -72,21 +76,31 @@ class DamageReportCreateSerializer(serializers.ModelSerializer):
             "city",
             "postcode",
             "building_type",
+            "damage_reported_before",
+            "is_own_property",
+            "damage_scope",
+            "comments",
             "applicable_case",
             "description",
             "contact_preference",
             "privacy_policy_accepted",
         ]
+        extra_kwargs = {
+            "description": {"required": False, "allow_blank": True},
+            "city": {"required": False, "allow_blank": True},
+            "postcode": {"required": False, "allow_blank": True},
+            "privacy_policy_accepted": {"required": False},
+        }
 
     def validate_description(self, value):
-        if len(value) < 20:
+        if value and len(value) < 20:
             raise serializers.ValidationError(
                 "Description must be at least 20 characters long."
             )
         return value
 
     def validate_privacy_policy_accepted(self, value):
-        if not value:
+        if value is False:
             raise serializers.ValidationError(
                 "You must agree to the privacy policy to submit a report."
             )

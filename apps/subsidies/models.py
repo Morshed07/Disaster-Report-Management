@@ -8,15 +8,10 @@ class SubsidyPropertyType(models.TextChoices):
     VVE = "vve", "Homeowners Association (Apartment / VvE)"
     RENTAL = "rental", "Rental property (Investment / rental)"
     COMMERCIAL = "commercial", "Commercial building"
+    OWNER_OCCUPIED = "owner_occupied", "Owner occupied"
 
 
 class ConstructionYearPeriod(models.TextChoices):
-    """
-    Dropdown options for "Year of construction of the property".
-    Exact ranges shown to the client for confirmation — adjust once
-    confirmed which periods they actually want listed.
-    """
-
     BEFORE_1920 = "before_1920", "Before 1920"
     Y1920_1945 = "1920_1945", "1920 - 1945"
     Y1946_1970 = "1946_1970", "1946 - 1970"

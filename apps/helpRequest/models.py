@@ -24,6 +24,13 @@ class HelpType(models.TextChoices):
     OBJECTION_PROCEDURES = "objection_procedures", "Objection procedures"
     REPAIR_OWN_CONTRACTOR = "repair_own_contractor", "Repair own contractor"
     OTHERWISE = "otherwise", "Otherwise"
+    # Compatibility choices
+    LEGAL_ADVICE = "legal_advice", "Legal advice"
+    DAMAGE_CLAIM_HELP = "damage_claim_help", "Damage claim help"
+    STRUCTURAL_INSPECTION = "structural_inspection", "Structural inspection"
+    SUBSIDY_ASSISTANCE = "subsidy_assistance", "Subsidy assistance"
+    GENERAL_INQUIRY = "general_inquiry", "General inquiry"
+    OTHER = "other", "Other"
 
 
 class ContactPreference(models.TextChoices):

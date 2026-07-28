@@ -22,10 +22,19 @@ def generate_case_number() -> str:
 
 
 class BuildingType(models.TextChoices):
+    HOME = "home", "Home (Private home)"
+    VVE = "vve", "Homeowners Association (Apartment / Homeowners Association)"
+    RENTAL = "rental", "Rental property (Investment / rental)"
+    COMMERCIAL = "commercial", "Commercial building (Commercial property)"
+    # Legacy backward-compatibility choices
     RESIDENTIAL = "residential", "Residential / House (Woning)"
-    VVE = "vve", "VvE (Homeowners Association) (VVE)"
-    COMMERCIAL = "commercial", "Commercial property (Bedrijfspand)"
     INVESTMENT = "investment", "Investment / Rental property (Belegging / verhuur)"
+
+
+class DamageScope(models.TextChoices):
+    DAMAGE_INSIDE = "damage_inside", "Damage inside"
+    DAMAGE_OUTSIDE = "damage_outside", "Damage outside"
+    SUBSIDENCE = "subsidence", "Subsidence"
 
 
 class ApplicableCase(models.TextChoices):
@@ -71,8 +80,8 @@ class TimeStampedModel(models.Model):
 
 class DamageReport(TimeStampedModel):
     """
-    Maps to the "Report damage" form (Image 5) and the resulting
-    "Case status" page (Image 2) / confirmation screen (Image 4).
+    Maps to the 3-step "Report earthquake damage" form (About you,
+    About the property, Your situation) and resulting status page.
     """
 
     case_number = models.CharField(
@@ -91,36 +100,60 @@ class DamageReport(TimeStampedModel):
         help_text="ActiveCampaign Deal ID for CRM sync.",
     )
 
-    # --- Contact & address fields ---
+    # --- Step 1: Contact & address fields ---
     name = models.CharField(max_length=150)
     email = models.EmailField()
     phone_number = models.CharField(max_length=30, blank=True)
     address = models.CharField(max_length=255, help_text="Street name and house number")
-    city = models.CharField(max_length=100)
-    postcode = models.CharField(max_length=10)
+    city = models.CharField(max_length=100, blank=True, default="")
+    postcode = models.CharField(max_length=10, blank=True, default="")
 
-    # --- Classification fields ---
+    # --- Step 2: About the property fields ---
     building_type = models.CharField(
         max_length=20,
         choices=BuildingType.choices,
-        default=BuildingType.RESIDENTIAL,
+        default=BuildingType.HOME,
     )
+    damage_reported_before = models.BooleanField(
+        default=False,
+        help_text="Has damage been reported before?",
+    )
+    is_own_property = models.BooleanField(
+        default=True,
+        help_text="Is the property your property?",
+    )
+
+    # --- Step 3: Your situation fields ---
+    damage_scope = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of damage aspects e.g. damage_inside, damage_outside, subsidence",
+    )
+    comments = models.TextField(
+        blank=True,
+        default="",
+        help_text="Any additional information that is important to us.",
+    )
+
+    # --- Legacy / optional classification fields ---
     applicable_case = models.CharField(
         max_length=30,
         choices=ApplicableCase.choices,
         default=ApplicableCase.NEW_REPORT,
+        blank=True,
     )
-
     description = models.TextField(
-        help_text="Describe the damage in as much detail as possible."
+        blank=True,
+        default="",
+        help_text="Describe the damage in as much detail as possible.",
     )
     contact_preference = models.CharField(
         max_length=10,
         choices=ContactPreference.choices,
         default=ContactPreference.EMAIL,
+        blank=True,
     )
-
-    privacy_policy_accepted = models.BooleanField(default=False)
+    privacy_policy_accepted = models.BooleanField(default=True)
 
     submitted_at = models.DateTimeField(auto_now_add=True)
 

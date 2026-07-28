@@ -3,7 +3,7 @@ from .views import ContactMessageCreateView
 
 urlpatterns = [
     path(
-        "messages/",
+        "",
         ContactMessageCreateView.as_view(),
         name="contact-message-create",
     ),

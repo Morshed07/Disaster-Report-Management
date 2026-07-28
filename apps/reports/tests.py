@@ -54,6 +54,35 @@ class DamageReportAPITests(APITestCase):
         # Verify AC sync was called
         mock_ac_sync.assert_called_once_with(created_report)
 
+    @patch("apps.reports.views._sync_damage_report_to_activecampaign")
+    @patch("apps.reports.tasks.send_confirmation_email.delay")
+    def test_submit_new_3step_damage_report_success(self, mock_email_task, mock_ac_sync):
+        """
+        Ensure we can submit a new 3-step damage report with step 1, step 2, step 3 fields.
+        """
+        data = {
+            "name": "Jan Jansen",
+            "email": "jan.jansen@example.nl",
+            "phone_number": "0612345678",
+            "address": "Extended Hereweg 12",
+            "building_type": "home",
+            "damage_reported_before": True,
+            "is_own_property": True,
+            "damage_scope": ["damage_inside", "subsidence"],
+            "comments": "Cracks appeared on living room wall.",
+        }
+
+        response = self.client.post(self.create_url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("case_number", response.data)
+        self.assertEqual(response.data["name"], "Jan Jansen")
+        self.assertEqual(response.data["building_type"], "home")
+        self.assertEqual(response.data["damage_reported_before"], True)
+        self.assertEqual(response.data["is_own_property"], True)
+        self.assertEqual(response.data["damage_scope"], ["damage_inside", "subsidence"])
+        self.assertEqual(response.data["comments"], "Cracks appeared on living room wall.")
+
     def test_submit_damage_report_validation_fails(self):
         """
         Ensure validation errors are returned for description length and privacy policy.

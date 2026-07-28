@@ -84,8 +84,14 @@ class DamageReportViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
 
-        # Trigger background Celery confirmation task
-        send_confirmation_email.delay(instance.case_number)
+        # Trigger background Celery confirmation task (non-blocking if Celery/Redis is down)
+        try:
+            send_confirmation_email.delay(instance.case_number)
+        except Exception:
+            logger.exception(
+                "Celery task dispatch failed for DamageReport %s — continuing.",
+                instance.case_number,
+            )
 
         # Outbound sync → ActiveCampaign (non-blocking)
         _sync_damage_report_to_activecampaign(instance)
