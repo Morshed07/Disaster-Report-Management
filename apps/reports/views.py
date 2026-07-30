@@ -159,12 +159,35 @@ AC_STAGE_TO_CASE_STATUS = {
     "payout": CaseStatus.COMPLETED,
 
     # Dutch mappings (from active ActiveCampaign setup)
-    "adres aangemeld img": CaseStatus.RECEIVED,
+    "adres aangemeld img": CaseStatus.UNDER_REVIEW,
     "schade-opname ingepland": CaseStatus.IN_PROGRESS,
     "adviesrapport ontvangen": CaseStatus.IN_PROGRESS,
-    "beschikking ontvangen": CaseStatus.IN_PROGRESS,
-    "beschikking ontvangen ": CaseStatus.IN_PROGRESS,
+    "beschikking ontvangen": CaseStatus.APPROVED,
+    "beschikking ontvangen ": CaseStatus.APPROVED,
     "schadebedrag uitbetaald en factuur gestuurd": CaseStatus.COMPLETED,
+}
+
+# Friendly, customer-facing Dutch notes for each ActiveCampaign stage.
+AC_STAGE_TO_NOTE = {
+    # Dutch mappings
+    "adres aangemeld img": "Adres aangemeld bij het Instituut Mijnbouwschade (IMG).",
+    "schade-opname ingepland": "Schade-opname op locatie ingepland.",
+    "adviesrapport ontvangen": "Adviesrapport ontvangen van het IMG.",
+    "beschikking ontvangen": "Beschikking ontvangen van het IMG.",
+    "beschikking ontvangen ": "Beschikking ontvangen van het IMG.",
+    "schadebedrag uitbetaald en factuur gestuurd": "Schadebedrag uitbetaald en dossier afgerond.",
+
+    # English fallbacks
+    "client / contract signed": "Contract ondertekend en aanvraag ontvangen.",
+    "contract signed": "Contract ondertekend en aanvraag ontvangen.",
+    "earthquake damage reported": "Schademelding in beoordeling.",
+    "damage reported": "Schademelding in beoordeling.",
+    "state inspection at property": "Schade-opname op locatie ingepland.",
+    "state inspection": "Schade-opname op locatie ingepland.",
+    "waiting for report": "Wachten op inspectierapport.",
+    "invoice processed / payout": "Schadebedrag uitbetaald en dossier afgerond.",
+    "invoice processed": "Factuur verwerkt en dossier afgerond.",
+    "payout": "Uitbetaling afgerond.",
 }
 
 # Phase 1 stage names — these are explicitly ignored (no-op).
@@ -290,11 +313,25 @@ class ActiveCampaignWebhookAPIView(APIView):
                 status=status.HTTP_200_OK,
             )
 
-        # 4. Create CaseUpdate timeline entry
-        status_display = dict(CaseStatus.choices).get(new_status, new_status)
-        note = f"Status updated to '{status_display}' via ActiveCampaign CRM."
-        if raw_stage:
-            note += f" (Stage: {raw_stage})"
+        # 4. Determine friendly note & check for duplicate entry
+        note = AC_STAGE_TO_NOTE.get(stage_key)
+        if not note:
+            status_display = dict(CaseStatus.choices).get(new_status, new_status)
+            note = f"Status bijgewerkt naar '{status_display}'."
+            if raw_stage:
+                note += f" ({raw_stage})"
+
+        # Prevent duplicate entries if the latest update has identical status and note
+        latest_update = report.updates.order_by("-created_at").first()
+        if latest_update and latest_update.status == new_status and latest_update.note == note:
+            return Response(
+                {
+                    "status": "ignored",
+                    "message": "Duplicate timeline entry skipped.",
+                    "case_number": report.case_number,
+                },
+                status=status.HTTP_200_OK,
+            )
 
         case_update = CaseUpdate.objects.create(
             damage_report=report,

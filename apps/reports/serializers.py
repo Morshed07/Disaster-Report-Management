@@ -114,7 +114,7 @@ class DamageReportCreateSerializer(serializers.ModelSerializer):
         CaseUpdate.objects.create(
             damage_report=damage_report,
             status=CaseStatus.RECEIVED,
-            note='Application recieved. You have recieved a confirmation email.'
+            note='Aanvraag ontvangen. U heeft een bevestigingsmail ontvangen.'
         )
 
         if request and request.FILES:

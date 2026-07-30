@@ -90,9 +90,15 @@ class ActiveCampaignClient:
             resp.raise_for_status()
             return resp.json()
         except requests.RequestException as exc:
-            raise ActiveCampaignError(
-                f"ActiveCampaign API error ({method} {path}): {exc}"
-            ) from exc
+            err_body = ""
+            if getattr(exc, "response", None) is not None:
+                try:
+                    err_body = f" | Body: {exc.response.text}"
+                except Exception:
+                    pass
+            err_msg = f"ActiveCampaign API error ({method} {path}): {exc}{err_body}"
+            logger.error(err_msg)
+            raise ActiveCampaignError(err_msg) from exc
 
     # ------------------------------------------------------------------
     # Public API
@@ -136,6 +142,9 @@ class ActiveCampaignClient:
         pipeline_id: str,
         stage_id: str,
         case_number: str = "",
+        owner_id: str = "1",
+        value: int = 0,
+        currency: str = "eur",
     ) -> str | None:
         """
         Create a new Deal in ActiveCampaign and optionally write our
@@ -150,9 +159,12 @@ class ActiveCampaignClient:
         payload = {
             "deal": {
                 "title": title,
-                "contact": contact_id,
-                "pipeline": pipeline_id,
-                "stage": stage_id,
+                "contact": str(contact_id),
+                "group": str(pipeline_id),
+                "stage": str(stage_id),
+                "owner": str(owner_id),
+                "value": value,
+                "currency": currency,
                 "status": 0,  # 0 = open
             }
         }
