@@ -7,9 +7,9 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install system dependencies for psycopg (PostgreSQL adapter)
+# Install system build dependencies for C-extensions (psycopg2, pillow, etc.)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc libpq-dev && \
+    apt-get install -y --no-install-recommends build-essential python3-dev libpq-dev zlib1g-dev libjpeg-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
