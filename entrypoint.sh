@@ -10,6 +10,9 @@ if [ "$POSTGRES_HOST" ]; then
     echo "PostgreSQL database is ready and accepting connections."
 fi
 
+# Ensure static and media directories exist
+mkdir -p /app/staticfiles /app/media
+
 # If the command is running gunicorn (web server), apply database migrations and collect static files
 case "$1" in
     *gunicorn*)
@@ -17,7 +20,7 @@ case "$1" in
         python manage.py migrate --noinput
 
         echo "Collecting static files..."
-        python manage.py collectstatic --noinput
+        python manage.py collectstatic --noinput --clear || python manage.py collectstatic --noinput
         ;;
 esac
 

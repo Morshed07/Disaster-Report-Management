@@ -40,11 +40,6 @@ COPY . .
 # Ensure entrypoint script is executable
 RUN chmod +x /app/entrypoint.sh
 
-# Create non-root user for security
-RUN adduser --disabled-password --no-create-home appuser && \
-    chown -R appuser:appuser /app
-USER appuser
-
 EXPOSE 8000
 
 ENTRYPOINT ["/app/entrypoint.sh"]
