@@ -72,11 +72,13 @@ docker compose -f docker-compose.prod.yml exec web python manage.py createsuperu
 
 Once deployed, your application is live at:
 
-* **Google Reviews API**: `http://191.218.162.194/api/v1/reviews/google/`
-* **Google Write Review Link**: `http://191.218.162.194/api/v1/reviews/google/write-url/`
-* **Damage Reports API**: `http://191.218.162.194/api/v1/reports/`
-* **ActiveCampaign Webhook**: `http://191.218.162.194/api/v1/webhooks/activecampaign/?secret=bevingshulpnoord-webhook-secret-2026`
-* **Django Admin**: `http://191.218.162.194/admin/`
+* **Frontend Web App**: `http://bevingshulpnoord.com/` (or `http://www.bevingshulpnoord.com/`)
+* **Backend API Base**: `http://backend.bevingshulpnoord.com/`
+* **Google Reviews API**: `http://backend.bevingshulpnoord.com/api/v1/reviews/google/`
+* **Google Write Review Link**: `http://backend.bevingshulpnoord.com/api/v1/reviews/google/write-url/`
+* **Damage Reports API**: `http://backend.bevingshulpnoord.com/api/v1/reports/`
+* **ActiveCampaign Webhook**: `http://backend.bevingshulpnoord.com/api/v1/webhooks/activecampaign/?secret=bevingshulpnoord-webhook-secret-2026`
+* **Django Admin**: `http://backend.bevingshulpnoord.com/admin/`
 
 ---
 
@@ -106,15 +108,20 @@ docker compose -f docker-compose.prod.yml restart
 
 ---
 
-## 🔐 Optional: SSL/HTTPS Setup with Certbot (When domain is added)
+## 🔐 SSL/HTTPS Setup with Certbot
 
-If you connect a domain name (e.g. `api.bevingshulpnoord.nl`) to IP `191.218.162.194`:
+Once DNS `A` records for `backend.bevingshulpnoord.com`, `bevingshulpnoord.com`, and `www.bevingshulpnoord.com` point to IP `191.218.162.194`:
 
 1. Install Certbot on VPS:
    ```bash
-   apt-get install -y certbot python3-certbot-nginx
+   apt-get update && apt-get install -y certbot python3-certbot-nginx
    ```
-2. Obtain SSL certificate:
+2. Obtain SSL certificate for backend & frontend domains:
    ```bash
-   certbot --nginx -d api.bevingshulpnoord.nl
+   certbot --nginx -d backend.bevingshulpnoord.com -d bevingshulpnoord.com -d www.bevingshulpnoord.com
    ```
+3. Test automatic certificate renewal:
+   ```bash
+   certbot renew --dry-run
+   ```
+
