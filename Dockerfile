@@ -7,9 +7,9 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install system dependencies for psycopg (PostgreSQL adapter)
+# Install system build dependencies for C-extensions (psycopg2, pillow, etc.)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc libpq-dev && \
+    apt-get install -y --no-install-recommends build-essential python3-dev libpq-dev zlib1g-dev libjpeg-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -25,9 +25,9 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install runtime dependency for PostgreSQL
+# Install runtime dependencies for PostgreSQL and healthchecks
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libpq5 && \
+    apt-get install -y --no-install-recommends libpq5 netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy installed Python packages from builder
@@ -37,16 +37,13 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy project source code
 COPY . .
 
-# Collect static files (uses production settings via wsgi.py default)
-RUN DJANGO_SETTINGS_MODULE=disaster.settings.production \
-    SECRET_KEY=build-placeholder \
-    python manage.py collectstatic --noinput 2>/dev/null || true
-
-# Create non-root user for security
-RUN adduser --disabled-password --no-create-home appuser
-USER appuser
+# Ensure entrypoint script is executable
+RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8000
 
-# Run with gunicorn
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Default command to run with gunicorn
 CMD ["gunicorn", "disaster.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]
+

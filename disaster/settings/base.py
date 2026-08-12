@@ -91,8 +91,7 @@ INSTALLED_APPS = [
     'apps.messages',
     'apps.subsidies',
     'apps.helpRequest',
-
-
+    'apps.reviews',
 ]
 
 MIDDLEWARE = [
@@ -227,3 +226,11 @@ ACTIVECAMPAIGN_CASE_NUMBER_FIELD_ID = env("ACTIVECAMPAIGN_CASE_NUMBER_FIELD_ID",
 ACTIVECAMPAIGN_WEBHOOK_SECRET = env("ACTIVECAMPAIGN_WEBHOOK_SECRET", default="")
 
 
+# -------------------------
+# Google Places / Reviews Configuration
+# -------------------------
+GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", default="")
+GOOGLE_PLACE_ID = env("GOOGLE_PLACE_ID", default="ChIJZZtq0ms1x0cRlnzKtwRxopo")
+GOOGLE_BUSINESS_FID = env("GOOGLE_BUSINESS_FID", default="0x47c5b5bb3a6a9b65:0x8ba67104b7ca7c96")
+GOOGLE_BUSINESS_CID = env("GOOGLE_BUSINESS_CID", default="10062953288126758038")
+GOOGLE_REVIEWS_CACHE_TIMEOUT = env.int("GOOGLE_REVIEWS_CACHE_TIMEOUT", default=86400)
