@@ -103,22 +103,36 @@ docker compose restart
 
 ---
 
-## 🔐 SSL/HTTPS Setup with Certbot
+## 🔐 SSL/HTTPS Setup with Certbot (Dockerized)
 
-Once DNS `A` records for `backend.bevingshulpnoord.com`, `bevingshulpnoord.com`, and `www.bevingshulpnoord.com` point to IP `191.218.162.194`:
+Once DNS `A` record for `backend.bevingshulpnoord.com` points to IP `191.218.162.194`:
 
-1. Install Certbot on VPS:
-   ```bash
-   apt-get update && apt-get install -y certbot python3-certbot-nginx
-   ```
-2. Obtain SSL certificate for backend & frontend domains:
-   ```bash
-   certbot --nginx -d backend.bevingshulpnoord.com -d bevingshulpnoord.com -d www.bevingshulpnoord.com
-   ```
-3. Test automatic certificate renewal:
-   ```bash
-   certbot renew --dry-run
-   ```
+### Step 1: Issue Initial SSL Certificate via Certbot Container
+Run the following Docker Compose command on your VPS to request the SSL certificate:
+```bash
+docker compose run --rm certbot certonly --webroot --webroot-path=/var/www/certbot -d backend.bevingshulpnoord.com --email info@bevingshulpnoord.nl --agree-tos --no-eff-email
+```
+
+### Step 2: Enable HTTPS Block in Nginx
+Open `nginx/conf.d/app.conf`:
+```bash
+nano nginx/conf.d/app.conf
+```
+Uncomment the HTTPS `server` block (lines 40 to 80), then save and exit.
+
+### Step 3: Reload Nginx Container
+Reload Nginx to apply HTTPS:
+```bash
+docker compose exec nginx nginx -s reload
+```
+
+### Step 4: Automatic Renewal
+The `certbot` service in `docker-compose.yml` automatically checks and renews certificates every 12 hours.
+To test renewal manually:
+```bash
+docker compose run --rm certbot renew --dry-run
+```
+
 
 
 

@@ -81,12 +81,23 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - static_data:/app/staticfiles:ro
       - media_data:/app/media:ro
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/www/certbot
     depends_on:
       - web
+
+  certbot:
+    image: certbot/certbot:latest
+    restart: always
+    volumes:
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 volumes:
   postgres_data:
   redis_data:
   static_data:
   media_data:
-
+  certbot_etc:
+  certbot_var:
