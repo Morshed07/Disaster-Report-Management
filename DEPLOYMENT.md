@@ -31,15 +31,10 @@ cd /var/www/disaster_management
 
 ---
 
-### Step 4: Configure Production Environment File (`.env.production`)
-Copy the provided template:
+### Step 4: Configure Environment File (`.env`)
+Edit `.env` if you need to update any passwords or API keys:
 ```bash
-cp .env.production.example .env.production
-```
-
-Edit `.env.production` if you need to update any passwords or API keys:
-```bash
-nano .env.production
+nano .env
 ```
 
 ---
@@ -47,7 +42,7 @@ nano .env.production
 ### Step 5: Build and Launch Containers
 Run Docker Compose in detached mode using `docker-compose.prod.yml`:
 ```bash
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose up -d --build
 ```
 
 This will automatically start:
@@ -63,7 +58,7 @@ This will automatically start:
 ### Step 6: Create Admin Superuser
 Create an admin user for Django admin panel:
 ```bash
-docker compose -f docker-compose.prod.yml exec web python manage.py createsuperuser
+docker compose exec web python manage.py createsuperuser
 ```
 
 ---
@@ -86,24 +81,24 @@ Once deployed, your application is live at:
 
 ### Check Container Status
 ```bash
-docker compose -f docker-compose.prod.yml ps
+docker compose ps
 ```
 
 ### View Application & Task Logs
 ```bash
 # View all logs in real-time
-docker compose -f docker-compose.prod.yml logs -f
+docker compose logs -f
 
 # View web container logs
-docker compose -f docker-compose.prod.yml logs -f web
+docker compose logs -f web
 
 # View Celery worker logs
-docker compose -f docker-compose.prod.yml logs -f celery_worker
+docker compose logs -f celery_worker
 ```
 
 ### Restart Services
 ```bash
-docker compose -f docker-compose.prod.yml restart
+docker compose restart
 ```
 
 ---
