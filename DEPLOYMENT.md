@@ -108,13 +108,13 @@ docker compose restart
 ### Step 1: Issue SSL Certificate for Backend
 Run on VPS:
 ```bash
-docker compose run --rm certbot certonly --webroot --webroot-path=/var/www/certbot -d backend.bevingshulpnoord.com --email info@bevingshulpnoord.nl --agree-tos --no-eff-email
+docker compose run --rm --entrypoint certbot certbot certonly --webroot --webroot-path=/var/www/certbot -d backend.bevingshulpnoord.com --email info@bevingshulpnoord.nl --agree-tos --no-eff-email
 ```
 
 ### Step 2: Issue SSL Certificate for Frontend (`bevingshulpnoord.nl`)
 Run on VPS:
 ```bash
-docker compose run --rm certbot certonly --webroot --webroot-path=/var/www/certbot -d bevingshulpnoord.nl -d www.bevingshulpnoord.nl --email info@bevingshulpnoord.nl --agree-tos --no-eff-email
+docker compose run --rm --entrypoint certbot certbot certonly --webroot --webroot-path=/var/www/certbot -d bevingshulpnoord.nl -d www.bevingshulpnoord.nl --email info@bevingshulpnoord.nl --agree-tos --no-eff-email
 ```
 
 ### Step 3: Reload Nginx Container
