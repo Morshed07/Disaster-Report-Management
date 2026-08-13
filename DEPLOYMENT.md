@@ -105,20 +105,17 @@ docker compose restart
 
 ## 🔐 SSL/HTTPS Setup with Certbot (Dockerized)
 
-Once DNS `A` record for `backend.bevingshulpnoord.com` points to IP `191.218.162.194`:
-
-### Step 1: Issue Initial SSL Certificate via Certbot Container
-Run the following Docker Compose command on your VPS to request the SSL certificate:
+### Step 1: Issue SSL Certificate for Backend
+Run on VPS:
 ```bash
 docker compose run --rm certbot certonly --webroot --webroot-path=/var/www/certbot -d backend.bevingshulpnoord.com --email info@bevingshulpnoord.nl --agree-tos --no-eff-email
 ```
 
-### Step 2: Enable HTTPS Block in Nginx
-Open `nginx/conf.d/app.conf`:
+### Step 2: Issue SSL Certificate for Frontend (`bevingshulpnoord.nl`)
+Run on VPS:
 ```bash
-nano nginx/conf.d/app.conf
+docker compose run --rm certbot certonly --webroot --webroot-path=/var/www/certbot -d bevingshulpnoord.nl -d www.bevingshulpnoord.nl --email info@bevingshulpnoord.nl --agree-tos --no-eff-email
 ```
-Uncomment the HTTPS `server` block (lines 40 to 80), then save and exit.
 
 ### Step 3: Reload Nginx Container
 Reload Nginx to apply HTTPS:
