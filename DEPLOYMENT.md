@@ -67,7 +67,7 @@ docker compose exec web python manage.py createsuperuser
 
 Once deployed, your application is live at:
 
-* **Frontend Web App**: `http://bevingshulpnoord.com/` (or `http://www.bevingshulpnoord.com/`)
+* **Frontend Web App**: `http://bevingshulpnoord.nl/` (redirects automatically from `.com`)
 * **Backend API Base**: `http://backend.bevingshulpnoord.com/`
 * **Google Reviews API**: `http://backend.bevingshulpnoord.com/api/v1/reviews/google/`
 * **Google Write Review Link**: `http://backend.bevingshulpnoord.com/api/v1/reviews/google/write-url/`
