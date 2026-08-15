@@ -58,14 +58,32 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     "ngrok-skip-browser-warning",
 ]
 
-# CSRF Trusted Origins for proxy tunneling (e.g. Ngrok)
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.ngrok-free.app",
-    "https://*.ngrok-free.dev",
-    "https://*.ngrok.io",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+# Trust reverse proxy SSL header (Nginx)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+# CSRF Trusted Origins (reads from env + includes production domains & dev proxies)
+csrf_trusted_env = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+CSRF_TRUSTED_ORIGINS = list(
+    set(
+        [
+            "https://backend.bevingshulpnoord.com",
+            "http://backend.bevingshulpnoord.com",
+            "https://bevingshulpnoord.com",
+            "http://bevingshulpnoord.com",
+            "https://www.bevingshulpnoord.com",
+            "http://www.bevingshulpnoord.com",
+            "http://191.218.162.194",
+            "https://191.218.162.194",
+            "https://*.ngrok-free.app",
+            "https://*.ngrok-free.dev",
+            "https://*.ngrok.io",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ]
+        + csrf_trusted_env
+    )
+)
 
 # Application definition
 
