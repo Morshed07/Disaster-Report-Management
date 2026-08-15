@@ -414,3 +414,37 @@ class OutboundActiveCampaignSyncTests(APITestCase):
         # User should still get 201 with case_number even though AC failed
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("case_number", response.data)
+
+    def test_send_confirmation_email_sends_user_and_admin_emails(self):
+        """
+        Verify send_confirmation_email sends a confirmation to the user
+        and a lead alert email to admin (info@bevingshulpnoord.nl).
+        """
+        from django.core import mail
+        from apps.reports.tasks import send_confirmation_email
+
+        report = DamageReport.objects.create(
+            name="Test Lead User",
+            email="leaduser@example.com",
+            phone_number="0612345678",
+            address="Grote Markt 1",
+            city="Groningen",
+            postcode="9711 LV",
+            description="Test damage report description for verification.",
+            privacy_policy_accepted=True,
+        )
+
+        result = send_confirmation_email(report.case_number)
+        self.assertTrue(result)
+
+        # 2 emails should be sent: 1 to user, 1 to admin
+        self.assertEqual(len(mail.outbox), 2)
+        recipients = [msg.to[0] for msg in mail.outbox]
+        self.assertIn("leaduser@example.com", recipients)
+        self.assertIn("info@bevingshulpnoord.nl", recipients)
+
+        # Check admin message subject
+        admin_msg = next(msg for msg in mail.outbox if "info@bevingshulpnoord.nl" in msg.to)
+        self.assertIn("New Lead", admin_msg.subject)
+        self.assertIn(report.case_number, admin_msg.body)
+        self.assertIn("Test Lead User", admin_msg.body)

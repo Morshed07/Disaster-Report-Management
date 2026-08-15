@@ -35,8 +35,42 @@ class SubsidyScanRequestAPIView(APIView):
         # Outbound sync → ActiveCampaign (non-blocking)
         self._sync_to_activecampaign(subsidy_scan_request)
 
+        # Send notification email to admin (non-blocking)
+        self._send_admin_email_notification(subsidy_scan_request)
+
         confirmation = SubsidyScanRequestConfirmationSerializer(subsidy_scan_request)
         return Response(confirmation.data, status=status.HTTP_201_CREATED)
+
+    @staticmethod
+    def _send_admin_email_notification(scan: SubsidyScanRequest) -> None:
+        """
+        Send notification email to admin when a new SubsidyScanRequest is created.
+        """
+        try:
+            from django.core.mail import send_mail
+            from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "info@bevingshulpnoord.nl")
+            admin_email = getattr(settings, "ADMIN_EMAIL", "info@bevingshulpnoord.nl")
+
+            subject = f"🚨 New Subsidy Scan Lead - {scan.full_name}"
+            message = (
+                f"Nieuwe Subsidiescan aanvraag ontvangen! / New Subsidy Scan Lead!\n\n"
+                f"Naam / Name: {scan.full_name}\n"
+                f"E-mail: {scan.email}\n"
+                f"Telefoon / Phone: {getattr(scan, 'phone_number', '') or 'N/A'}\n"
+                f"Postcode: {getattr(scan, 'postcode', '') or getattr(scan, 'postal_code', '') or 'N/A'}\n"
+                f"Huisnummer / House Number: {getattr(scan, 'house_number', '') or 'N/A'}\n\n"
+                f"Bekijk de aanvraag in het Django Admin panel of ActiveCampaign."
+            )
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=from_email,
+                recipient_list=[admin_email],
+                fail_silently=True,
+            )
+            logger.info(f"Admin email notification sent for SubsidyScanRequest {scan.pk} to {admin_email}")
+        except Exception as e:
+            logger.error(f"Failed to send admin email for SubsidyScanRequest {scan.pk}: {e}")
 
     @staticmethod
     def _sync_to_activecampaign(scan: SubsidyScanRequest) -> None:
