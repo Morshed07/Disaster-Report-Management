@@ -48,7 +48,7 @@ class SubsidyScanRequestAPIView(APIView):
         """
         try:
             from django.core.mail import send_mail
-            from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "info@bevingshulpnoord.nl")
+            from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "Bevingshulp Noord <info@bevingshulpnoord.nl>")
             admin_email = getattr(settings, "ADMIN_EMAIL", "info@bevingshulpnoord.nl")
 
             subject = f"🚨 New Subsidy Scan Lead - {scan.full_name}"

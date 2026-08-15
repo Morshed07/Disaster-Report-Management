@@ -19,7 +19,7 @@ def send_confirmation_email(case_number: str) -> bool:
         logger.error(f"Cannot send confirmation email. Case {case_number} not found.")
         return False
 
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "info@bevingshulpnoord.nl")
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "Bevingshulp Noord <info@bevingshulpnoord.nl>")
     admin_email = getattr(settings, "ADMIN_EMAIL", "info@bevingshulpnoord.nl")
 
     # -----------------------------------------------------------------------

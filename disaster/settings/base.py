@@ -226,7 +226,7 @@ EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="lettermint")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="info@bevingshulpnoord.nl")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Bevingshulp Noord <info@bevingshulpnoord.nl>")
 ADMIN_EMAIL = env("ADMIN_EMAIL", default="info@bevingshulpnoord.nl")
 LETTERMINT_API_KEY = env("LETTERMINT_API_KEY", default="")
 

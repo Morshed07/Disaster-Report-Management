@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         recipient = options["recipient"]
-        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "info@bevingshulpnoord.nl")
+        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "Bevingshulp Noord <info@bevingshulpnoord.nl>")
 
         self.stdout.write(f"Sending test email via {settings.EMAIL_HOST}:{settings.EMAIL_PORT}...")
         self.stdout.write(f"From: {from_email}")
