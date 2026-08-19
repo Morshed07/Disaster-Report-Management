@@ -86,12 +86,75 @@ class GoogleReviewsService:
 
     def fetch_from_google_api(self) -> Optional[Dict[str, Any]]:
         """
-        Fetch place details directly from Google Places API (Details API).
+        Fetch place details directly from Google Places API (New & Legacy API support).
         """
         if not self.api_key:
             logger.info("GOOGLE_PLACES_API_KEY is not configured; using fallback reviews.")
             return None
 
+        # 1. Try Places API (New)
+        new_api_result = self._fetch_from_places_api_new()
+        if new_api_result:
+            return new_api_result
+
+        # 2. Fall back to Legacy Places API
+        return self._fetch_from_places_api_legacy()
+
+    def _fetch_from_places_api_new(self) -> Optional[Dict[str, Any]]:
+        """
+        Fetch place details using Google Places API (New v1 endpoint).
+        """
+        url = f"https://places.googleapis.com/v1/places/{self.place_id}"
+        headers = {
+            "X-Goog-Api-Key": self.api_key,
+            "X-Goog-FieldMask": "id,displayName,rating,userRatingCount,reviews",
+            "Accept-Language": "nl",
+        }
+
+        try:
+            response = requests.get(url, headers=headers, timeout=8)
+            if response.status_code == 200:
+                data = response.json()
+                display_name = data.get("displayName", {})
+                name = display_name.get("text", "Bevingshulp Noord") if isinstance(display_name, dict) else "Bevingshulp Noord"
+                rating = data.get("rating", 5.0)
+                user_ratings_total = data.get("userRatingCount", 0)
+
+                raw_reviews = data.get("reviews", [])
+                normalized_reviews = []
+                for rev in raw_reviews:
+                    author_attrib = rev.get("authorAttribution", {})
+                    text_obj = rev.get("text", {})
+                    text_str = text_obj.get("text", "") if isinstance(text_obj, dict) else str(text_obj)
+
+                    normalized_reviews.append({
+                        "author_name": author_attrib.get("displayName", "Google User"),
+                        "author_url": author_attrib.get("uri", ""),
+                        "profile_photo_url": author_attrib.get("photoUri", ""),
+                        "rating": rev.get("rating", 5),
+                        "relative_time_description": rev.get("relativePublishTimeDescription", ""),
+                        "text": text_str,
+                        "time": 0,
+                    })
+
+                return {
+                    "name": name,
+                    "rating": float(rating),
+                    "user_ratings_total": int(user_ratings_total),
+                    "reviews": normalized_reviews,
+                    "source": "google_places_api",
+                }
+            else:
+                logger.info("Places API (New) returned status code %s: %s", response.status_code, response.text)
+                return None
+        except Exception as exc:
+            logger.error("Failed to connect to Places API (New): %s", exc)
+            return None
+
+    def _fetch_from_places_api_legacy(self) -> Optional[Dict[str, Any]]:
+        """
+        Fetch place details directly from Legacy Google Places API (Details API).
+        """
         url = "https://maps.googleapis.com/maps/api/place/details/json"
         params = {
             "place_id": self.place_id,
@@ -106,7 +169,7 @@ class GoogleReviewsService:
             data = response.json()
 
             if data.get("status") != "OK":
-                logger.warning("Google Places API error status: %s", data.get("status"))
+                logger.warning("Legacy Google Places API error status: %s - %s", data.get("status"), data.get("error_message", ""))
                 return None
 
             result = data.get("result", {})
@@ -118,7 +181,7 @@ class GoogleReviewsService:
                 "source": "google_places_api",
             }
         except Exception as exc:
-            logger.error("Failed to connect to Google Places API: %s", exc)
+            logger.error("Failed to connect to Legacy Google Places API: %s", exc)
             return None
 
     def get_fallback_data(self) -> Dict[str, Any]:
