@@ -1,6 +1,8 @@
+import os
 import logging
+from email.mime.image import MIMEImage
 from celery import shared_task
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 from django.template.loader import render_to_string
 from .models import DamageReport
@@ -66,14 +68,33 @@ def send_confirmation_email(case_number: str) -> bool:
 
     user_email_sent = False
     try:
-        send_mail(
+        email_msg = EmailMultiAlternatives(
             subject=user_subject,
-            message=user_message,
+            body=user_message,
             from_email=from_email,
-            recipient_list=[report.email],
-            html_message=user_html_message,
-            fail_silently=False,
+            to=[report.email],
         )
+        email_msg.attach_alternative(user_html_message, "text/html")
+
+        # Attach logo as inline MIMEImage (CID) so email clients display it reliably without external proxy blockers
+        icon_candidates = [
+            os.path.join(settings.BASE_DIR, "static", "icon", "icon.png"),
+            os.path.join(str(getattr(settings, "STATIC_ROOT", "")), "icon", "icon.png"),
+            os.path.join(settings.BASE_DIR, "staticfiles", "icon", "icon.png"),
+        ]
+        for icon_path in icon_candidates:
+            if icon_path and os.path.exists(icon_path):
+                try:
+                    with open(icon_path, "rb") as f:
+                        img = MIMEImage(f.read())
+                        img.add_header("Content-ID", "<logo_icon>")
+                        img.add_header("Content-Disposition", "inline", filename="icon.png")
+                        email_msg.attach(img)
+                    break
+                except Exception as img_err:
+                    logger.warning(f"Could not attach inline logo_icon: {img_err}")
+
+        email_msg.send(fail_silently=False)
         user_email_sent = True
         logger.info(f"Confirmation email successfully sent for case {case_number} to user {report.email}")
     except Exception as e:
