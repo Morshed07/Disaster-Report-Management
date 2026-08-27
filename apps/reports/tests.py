@@ -452,10 +452,11 @@ class OutboundActiveCampaignSyncTests(APITestCase):
         self.assertEqual(len(user_msg.alternatives), 1)
         html_content, mimetype = user_msg.alternatives[0]
         self.assertEqual(mimetype, "text/html")
-        self.assertIn("Uw Gratis Schadecheck Aanvraag", html_content)
+        self.assertIn("Bedankt voor uw aanvraag van de gratis schadecheck", html_content)
         self.assertIn("Beste Test,", html_content)
         self.assertIn(report.case_number, html_content)
-        self.assertIn("Kosteloos &amp; Onafhankelijk", html_content)
+        self.assertIn("Wat gebeurt er nu?", html_content)
+        self.assertIn("Advies | Subsidies | Herstel", html_content)
 
         # Check admin message subject
         admin_msg = next(msg for msg in mail.outbox if "info@bevingshulpnoord.nl" in msg.to)
