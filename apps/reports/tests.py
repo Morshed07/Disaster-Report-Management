@@ -443,6 +443,20 @@ class OutboundActiveCampaignSyncTests(APITestCase):
         self.assertIn("leaduser@example.com", recipients)
         self.assertIn("info@bevingshulpnoord.nl", recipients)
 
+        # Check user message subject & content
+        user_msg = next(msg for msg in mail.outbox if "leaduser@example.com" in msg.to)
+        self.assertEqual(user_msg.subject, f"Uw schadecheck aanvraag is ontvangen – {report.case_number}")
+        self.assertIn("Beste Test,", user_msg.body)
+        self.assertIn(report.case_number, user_msg.body)
+        # Check that HTML alternative was attached and rendered properly
+        self.assertEqual(len(user_msg.alternatives), 1)
+        html_content, mimetype = user_msg.alternatives[0]
+        self.assertEqual(mimetype, "text/html")
+        self.assertIn("Uw Gratis Schadecheck Aanvraag", html_content)
+        self.assertIn("Beste Test,", html_content)
+        self.assertIn(report.case_number, html_content)
+        self.assertIn("Kosteloos &amp; Onafhankelijk", html_content)
+
         # Check admin message subject
         admin_msg = next(msg for msg in mail.outbox if "info@bevingshulpnoord.nl" in msg.to)
         self.assertIn("New Lead", admin_msg.subject)

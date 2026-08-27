@@ -2,6 +2,7 @@ import logging
 from celery import shared_task
 from django.core.mail import send_mail
 from django.conf import settings
+from django.template.loader import render_to_string
 from .models import DamageReport
 
 logger = logging.getLogger(__name__)
@@ -25,16 +26,42 @@ def send_confirmation_email(case_number: str) -> bool:
     # -----------------------------------------------------------------------
     # 1. User Confirmation Email
     # -----------------------------------------------------------------------
-    user_subject = f"Damage Report Submitted - {report.case_number}"
+    parts = report.name.strip().split()
+    voornaam = parts[0] if parts else report.name
+
+    user_subject = f"Uw schadecheck aanvraag is ontvangen – {report.case_number}"
+    user_context = {
+        "voornaam": voornaam,
+        "zaaknummer": report.case_number,
+        "report": report,
+    }
+
+    user_html_message = render_to_string(
+        "reports/emails/damage_report_confirmation.html",
+        user_context,
+    )
+
     user_message = (
-        f"Dear {report.name},\n\n"
-        f"Thank you for submitting your damage report.\n\n"
-        f"We have received your application and created a case for you.\n"
-        f"Your Case Number is: {report.case_number}\n\n"
-        f"You can use this number along with your email address ({report.email}) "
-        f"to track the progress of your application on our status portal.\n\n"
-        f"Best regards,\n"
-        f"Disaster Management Team"
+        f"Beste {voornaam},\n\n"
+        f"Bedankt voor uw aanvraag van de gratis schadecheck. Wij hebben uw aanvraag in goede orde ontvangen.\n\n"
+        f"Voor uw aanvraag is automatisch een zaaknummer aangemaakt:\n"
+        f"Zaaknummer: {report.case_number}\n\n"
+        f"Bewaar dit zaaknummer goed. Wij gebruiken het zaaknummer in de verdere communicatie over uw aanvraag.\n\n"
+        f"Wat gebeurt er nu?\n"
+        f"Wij bekijken de door u ingevulde gegevens en bekijken de mogelijkheden. "
+        f"Vervolgens nemen wij persoonlijk contact met u op om uw situatie te bespreken en een gratis schadecheck met u in te plannen.\n\n"
+        f"Heeft u in de tussentijd aanvullende informatie, documenten of foto's die voor uw aanvraag van belang kunnen zijn? "
+        f"Dan kunt u deze aan ons toesturen onder vermelding van uw zaaknummer.\n\n"
+        f"Heeft u vragen? Neem gerust contact met ons op.\n\n"
+        f"Met vriendelijke groet,\n"
+        f"Team Bevingshulp Noord\n\n"
+        f"---\n"
+        f"Bevingshulp Noord\n"
+        f"Advies | Subsidies | Herstel\n"
+        f"Telefoon: 050 211 1892\n"
+        f"E-mail: info@bevingshulpnoord.nl\n"
+        f"Website: www.bevingshulpnoord.nl\n"
+        f"Adres: Blekerstraat 28A – 9718 EC Groningen"
     )
 
     user_email_sent = False
@@ -44,6 +71,7 @@ def send_confirmation_email(case_number: str) -> bool:
             message=user_message,
             from_email=from_email,
             recipient_list=[report.email],
+            html_message=user_html_message,
             fail_silently=False,
         )
         user_email_sent = True
